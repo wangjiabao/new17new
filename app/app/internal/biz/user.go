@@ -5112,7 +5112,7 @@ func (uuc *UserUseCase) AdminDailyReward(ctx context.Context, req *v1.AdminDaily
 			numTwo = threeRate
 		} else if 300 <= tmpBuyRecords.Amount {
 			numTwo = twoRate
-		} else if 100 <= tmpBuyRecords.Amount {
+		} else if 50 <= tmpBuyRecords.Amount {
 			numTwo = oneRate
 		} else {
 			continue
@@ -5228,7 +5228,7 @@ func (uuc *UserUseCase) AdminDailyReward(ctx context.Context, req *v1.AdminDaily
 			numTwo = threeRate
 		} else if 300 <= tmpBuyRecords.Amount {
 			numTwo = twoRate
-		} else if 100 <= tmpBuyRecords.Amount {
+		} else if 50 <= tmpBuyRecords.Amount {
 			numTwo = oneRate
 		} else {
 			continue
@@ -5601,7 +5601,7 @@ func (uuc *UserUseCase) AdminDailyReward(ctx context.Context, req *v1.AdminDaily
 			numTwo = threeRate
 		} else if 300 <= tmpBuyRecords.Amount {
 			numTwo = twoRate
-		} else if 100 <= tmpBuyRecords.Amount {
+		} else if 50 <= tmpBuyRecords.Amount {
 			numTwo = oneRate
 		} else {
 			continue
