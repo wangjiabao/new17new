@@ -4423,7 +4423,7 @@ func (ui *UserInfoRepo) UpdateUserIspay(ctx context.Context, userId int64, amoun
 	var err error
 	if err = ui.data.DB(ctx).Table("user_balance").
 		Where("user_id=?", userId).
-		Updates(map[string]interface{}{"balance_raw_float_new": float64(amount)}).Error; nil != err {
+		Updates(map[string]interface{}{"balance_raw_float": float64(amount)}).Error; nil != err {
 		return errors.NotFound("user balance err", "user balance not found")
 	}
 
