@@ -266,6 +266,22 @@ type UserSortRecommendReward struct {
 	Total  int64
 }
 
+type BuyRecordFour struct {
+	ID              int64
+	UserId          int64
+	Status          int64
+	Amount          float64
+	AmountGet       float64
+	AmountGetPerDay float64
+	LastUpdated     int64
+	One             string
+	Two             string
+	Three           string
+	Four            int64
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
 type BuyRecord struct {
 	ID          int64
 	UserId      int64
@@ -357,6 +373,7 @@ type UserBalanceRepo interface {
 	GetGoodsPageThree(ctx context.Context, b *Pagination) ([]*Good, error, int64)
 	GetUserBuyByUserId(ctx context.Context, userId int64) ([]*BuyRecord, error)
 	GetUserBuyById(id int64) (*BuyRecord, error)
+	GetUserBuyFour(ctx context.Context, b *Pagination, userId int64) ([]*BuyRecordFour, error, int64)
 	GetUserRewardsLastMonthFee(ctx context.Context) ([]*Reward, error)
 	GetUserBalanceByUserIds(ctx context.Context, userIds ...int64) (map[int64]*UserBalance, error)
 	GetUserBalanceLockByUserIds(ctx context.Context, userIds ...int64) (map[int64]*UserBalance, error)
@@ -474,6 +491,7 @@ type UserInfoRepo interface {
 	UpdateUserMyTotalAmountAdd(ctx context.Context, userId int64, amountUsdt, myTotal float64) error
 	UpdateUserMyTotalAmountSub(ctx context.Context, userId int64, amountUsdt float64) error
 	GetBuyRecord(ctx context.Context, day int) ([]*BuyRecord, error)
+	GetBuyRecordFour(ctx context.Context) ([]*BuyRecordFour, error)
 	UpdateTotalOne(ctx context.Context, amountUsdt float64) error
 	UpdateUserNewTwoNewThree(ctx context.Context, userId int64, amount uint64, last uint64, coinType string) error
 	UpdateUserIspay(ctx context.Context, userId int64, amount uint64) error
@@ -498,6 +516,7 @@ type UserInfoRepo interface {
 	UpdateUserRewardTotalOver(ctx context.Context) error
 	UpdateUserRewardRecommend2(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool, address string) error
 	UpdateUserRewardDailyLocation(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool) error
+	UpdateUserRewardDailyIspay(ctx context.Context, id, userId int64, raw, rawOrigin, usdtOrigin float64, stop bool) error
 	UpdateUserSubBuyRecord(ctx context.Context, id, userId int64, amountOrigin float64) error
 	UpdateUserRewardAreaOne(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool, address string, i, cl int64, two bool) error
 	UpdateUserRewardRecommendNewTwo(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool, address string, i int64) error
@@ -975,6 +994,102 @@ func (uuc *UserUseCase) AdminUserList(ctx context.Context, req *v1.AdminUserList
 			Lock:               vUsers.Lock,
 			LockReward:         vUsers.LockReward,
 			MyRecommendAddress: addressMyRecommend,
+		})
+	}
+
+	return res, nil
+}
+
+func (uuc *UserUseCase) AdminBuyFourList(ctx context.Context, req *v1.AdminBuyListRequest) (*v1.AdminBuyListReply, error) {
+
+	var (
+		userSearch  *User
+		userId      int64 = 0
+		userRewards []*BuyRecordFour
+		users       map[int64]*User
+		userIdsMap  map[int64]int64
+		userIds     []int64
+		err         error
+		count       int64
+		goods       []*Good
+		goodsMap    map[int64]*Good
+	)
+	res := &v1.AdminBuyListReply{
+		Rewards: make([]*v1.AdminBuyListReply_List, 0),
+	}
+
+	// 地址查询
+	if "" != req.Address {
+		userSearch, err = uuc.repo.GetUserByAddress(ctx, req.Address)
+		if nil != err {
+			return res, nil
+		}
+		userId = userSearch.ID
+	}
+
+	userRewards, err, count = uuc.ubRepo.GetUserBuyFour(ctx, &Pagination{
+		PageNum:  int(req.Page),
+		PageSize: 10,
+	}, userId)
+	if nil != err {
+		return res, nil
+	}
+	res.Count = count
+
+	userIdsMap = make(map[int64]int64, 0)
+	for _, vUserReward := range userRewards {
+		userIdsMap[vUserReward.UserId] = vUserReward.UserId
+	}
+	for _, v := range userIdsMap {
+		userIds = append(userIds, v)
+	}
+
+	goods, err = uuc.ubRepo.GetGoods(ctx)
+	if nil != err {
+		return nil, err
+	}
+	goodsMap = make(map[int64]*Good, 0)
+	for _, v := range goods {
+		goodsMap[v.ID] = v
+	}
+
+	users, err = uuc.repo.GetUserByUserIds(ctx, userIds...)
+	for _, vUserReward := range userRewards {
+		tmpUser := ""
+		if nil != users {
+			if _, ok := users[vUserReward.UserId]; ok {
+				tmpUser = users[vUserReward.UserId].Address
+			}
+		}
+
+		oneTmp := ""
+		if "1" != vUserReward.One {
+			oneTmp = vUserReward.One
+		}
+		twoTmp := ""
+		if "1" != vUserReward.One {
+			twoTmp = vUserReward.Two
+		}
+		threeTmp := ""
+		if "1" != vUserReward.One {
+			threeTmp = vUserReward.Three
+		}
+		fourTmp := ""
+		if 0 != vUserReward.Four {
+			if _, ok := goodsMap[vUserReward.Four]; ok {
+				fourTmp = goodsMap[vUserReward.Four].Name
+			}
+		}
+
+		res.Rewards = append(res.Rewards, &v1.AdminBuyListReply_List{
+			CreatedAt: vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
+			Amount:    strconv.FormatInt(vUserReward.Four, 10),
+			Address:   tmpUser,
+			Id:        vUserReward.ID,
+			One:       fourTmp,
+			Two:       oneTmp,
+			Three:     twoTmp,
+			Four:      threeTmp,
 		})
 	}
 
@@ -4764,6 +4879,72 @@ func (uuc *UserUseCase) AdminMyTotalAmount(ctx context.Context, req *v1.AdminDai
 	//for k, v := range userTotalAmount {
 	//	fmt.Println("用户", k, v)
 	//}
+
+	return nil, nil
+}
+
+func (uuc *UserUseCase) AdminDailyRewardFour(ctx context.Context, req *v1.AdminDailyRewardRequest) (*v1.AdminDailyRewardReply, error) {
+	lockAll.Lock()
+	defer lockAll.Unlock()
+	var (
+		configs    []*Config
+		openReward uint64
+		err        error
+	)
+	// 配置
+	configs, err = uuc.configRepo.GetConfigByKeys(ctx, "open_reward")
+	if nil != err || nil == configs {
+		fmt.Println("错误分红，配置", err)
+		return &v1.AdminDailyRewardReply{}, nil
+	}
+	for _, vConfig := range configs {
+		if "open_reward" == vConfig.KeyName {
+			openReward, _ = strconv.ParseUint(vConfig.Value, 10, 64)
+		}
+	}
+
+	if 1 != openReward {
+		fmt.Println("关闭分红", openReward)
+		return &v1.AdminDailyRewardReply{}, nil
+	}
+
+	var (
+		buyRecords []*BuyRecordFour
+	)
+	buyRecords, err = uuc.uiRepo.GetBuyRecordFour(ctx)
+	if nil != err {
+		fmt.Println("认购数据查询错误")
+		return nil, err
+	}
+
+	for _, v := range buyRecords {
+		stop := false
+		tmpC := float64(0)
+		if v.Amount <= v.AmountGet {
+			fmt.Println("错误数据，每日ispay分红", v)
+			continue
+		}
+
+		if v.Amount <= v.AmountGetPerDay+v.AmountGet {
+			stop = true
+			tmpC = v.Amount - v.AmountGet
+		} else {
+			tmpC = v.AmountGetPerDay
+		}
+
+		if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+			err = uuc.uiRepo.UpdateUserRewardDailyIspay(ctx, v.ID, v.UserId, tmpC, v.Amount, float64(v.Four), stop)
+			if err != nil {
+				fmt.Println("错误分红静态：", err, v)
+				return err
+			}
+
+			return nil
+		}); nil != err {
+			fmt.Println("err reward daily", err, v)
+			continue
+		}
+	}
 
 	return nil, nil
 }

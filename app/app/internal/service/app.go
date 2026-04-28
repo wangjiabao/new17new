@@ -357,6 +357,10 @@ func (a *AppService) AdminDailyReward(ctx context.Context, req *v1.AdminDailyRew
 	return a.uuc.AdminDailyReward(ctx, req)
 }
 
+func (a *AppService) AdminDailyRewardFour(ctx context.Context, req *v1.AdminDailyRewardRequest) (*v1.AdminDailyRewardReply, error) {
+	return a.uuc.AdminDailyRewardFour(ctx, req)
+}
+
 func (a *AppService) AdminMyTotalAmount(ctx context.Context, req *v1.AdminDailyRewardRequest) (*v1.AdminDailyRewardReply, error) {
 	return a.uuc.AdminMyTotalAmount(ctx, req)
 }
@@ -1987,6 +1991,10 @@ func (a *AppService) AdminBuyList(ctx context.Context, req *v1.AdminBuyListReque
 	return a.uuc.AdminBuyList(ctx, req)
 }
 
+func (a *AppService) AdminBuyFourList(ctx context.Context, req *v1.AdminBuyListRequest) (*v1.AdminBuyListReply, error) {
+	return a.uuc.AdminBuyFourList(ctx, req)
+}
+
 func (a *AppService) AdminBuyListTwo(ctx context.Context, req *v1.AdminBuyListRequest) (*v1.AdminBuyListReply, error) {
 	return a.uuc.AdminBuyListTwo(ctx, req)
 }
@@ -2710,8 +2718,8 @@ func (a *AppService) AdminWithdrawEth(ctx context.Context, req *v1.AdminWithdraw
 			continue
 		}
 
-		if "RAW" == withdraw.Type {
-			tokenAddress = ""
+		if "RAW_NEW" == withdraw.Type {
+			tokenAddress = "0xDac444181Aa59086b2bD5FE8d99647FDf3E33333"
 		} else if "USDT" == withdraw.Type {
 			tokenAddress = "0x55d398326f99059fF775485246999027B3197955"
 		} else {

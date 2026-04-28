@@ -276,6 +276,33 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/admin_dhb/buy_four_list:
+        get:
+            tags:
+                - App
+            operationId: App_AdminBuyFourList
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: address
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AdminBuyListReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/admin_dhb/buy_list:
         get:
             tags:
@@ -675,6 +702,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AdminDailyRecommendRewardReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin_dhb/daily_reward_four:
+        get:
+            tags:
+                - App
+            operationId: App_AdminDailyRewardFour
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AdminDailyRewardReply'
                 default:
                     description: Default error response
                     content:

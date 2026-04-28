@@ -275,6 +275,22 @@ type BuyRecord struct {
 	UpdatedAt   time.Time `gorm:"type:datetime;not null"`
 }
 
+type BuyRecordFour struct {
+	ID              int64     `gorm:"primarykey;type:int"`
+	UserId          int64     `gorm:"type:int;not null"`
+	Status          int64     `gorm:"type:int;not null"`
+	Amount          float64   `gorm:"type:decimal(65,20);not null"`
+	AmountGet       float64   `gorm:"type:decimal(65,20);not null"`
+	AmountGetPerDay float64   `gorm:"type:decimal(65,20);not null"`
+	LastUpdated     int64     `gorm:"type:int;not null"`
+	One             string    `gorm:"type:varchar(500);not null"`
+	Two             string    `gorm:"type:varchar(45);not null"`
+	Three           string    `gorm:"type:varchar(45);not null"`
+	Four            int64     `gorm:"type:int;not null"`
+	CreatedAt       time.Time `gorm:"type:datetime;not null"`
+	UpdatedAt       time.Time `gorm:"type:datetime;not null"`
+}
+
 type AdminAuth struct {
 	ID      int64 `gorm:"primarykey;type:int"`
 	AdminId int64 `gorm:"type:int"`
@@ -3162,6 +3178,66 @@ func (ui *UserInfoRepo) UpdateUserSubBuyRecord(ctx context.Context, id, userId i
 	return nil
 }
 
+// UpdateUserRewardDailyIspay .
+func (ui *UserInfoRepo) UpdateUserRewardDailyIspay(ctx context.Context, id, userId int64, raw, rawOrigin, usdtOrigin float64, stop bool) error {
+	var err error
+
+	if stop {
+		res := ui.data.DB(ctx).Table("user").Where("id=?", userId).
+			Updates(map[string]interface{}{
+				"amount_four_new":       gorm.Expr("amount_four_new - ?", usdtOrigin),
+				"amount_four_new_ispay": gorm.Expr("amount_four_new_ispay - ?", rawOrigin),
+				"updated_at":            time.Now().Format("2006-01-02 15:04:05"),
+			})
+		if res.Error != nil || 1 != res.RowsAffected {
+			return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+		}
+
+		res = ui.data.DB(ctx).Table("buy_record_four").Where("id=?", id).
+			Updates(map[string]interface{}{
+				"status":     2,
+				"amount_get": gorm.Expr("amount_get + ?", raw),
+				"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+			})
+		if res.Error != nil || 1 != res.RowsAffected {
+			return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+		}
+	} else {
+		if 0 < raw {
+			res := ui.data.DB(ctx).Table("buy_record_four").Where("id=?", id).
+				Updates(map[string]interface{}{
+					"amount_get": gorm.Expr("amount_get + ?", raw),
+					"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+				})
+			if res.Error != nil {
+				return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+			}
+		}
+	}
+
+	if 0 < raw {
+		res := ui.data.DB(ctx).Table("user").Where("id=?", userId).
+			Updates(map[string]interface{}{
+				"ispay_new":  gorm.Expr("ispay_new + ?", raw),
+				"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+			})
+		if res.Error != nil || 1 != res.RowsAffected {
+			return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+		}
+
+		var reward Reward
+		reward.UserId = userId
+		reward.AmountNew = raw
+		reward.Reason = "ispay_reward"
+		err = ui.data.DB(ctx).Table("reward").Create(&reward).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // UpdateUserRewardDailyLocation .
 func (ui *UserInfoRepo) UpdateUserRewardDailyLocation(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool) error {
 	var err error
@@ -3573,6 +3649,37 @@ func (ui *UserInfoRepo) GetBuyRecordMap(ctx context.Context, userIds []int64) (m
 			CreatedAt:   v.CreatedAt,
 			UpdatedAt:   v.UpdatedAt,
 			LastUpdated: v.LastUpdated,
+		})
+	}
+
+	return res, nil
+}
+
+// GetBuyRecordFour .
+func (ui *UserInfoRepo) GetBuyRecordFour(ctx context.Context) ([]*biz.BuyRecordFour, error) {
+	res := make([]*biz.BuyRecordFour, 0)
+
+	var buyRecord []*BuyRecordFour
+	if err := ui.data.db.Table("buy_record_four").Where("status=?", 1).Find(&buyRecord).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return res, nil
+		}
+
+		return nil, errors.New(500, "buy_record ERROR", err.Error())
+	}
+
+	for _, v := range buyRecord {
+		res = append(res, &biz.BuyRecordFour{
+			ID:              v.ID,
+			UserId:          v.UserId,
+			Status:          v.Status,
+			Amount:          v.Amount,
+			AmountGet:       v.AmountGet,
+			CreatedAt:       v.CreatedAt,
+			UpdatedAt:       v.UpdatedAt,
+			LastUpdated:     v.LastUpdated,
+			AmountGetPerDay: v.AmountGetPerDay,
+			Four:            v.Four,
 		})
 	}
 
@@ -6598,6 +6705,52 @@ func (ub *UserBalanceRepo) GetGoodsPageThree(ctx context.Context, b *biz.Paginat
 			Two:    good.Two,
 			Three:  good.Three,
 			Status: uint64(good.Status),
+		})
+	}
+
+	return res, nil, count
+}
+
+// GetUserBuyFour .
+func (ub *UserBalanceRepo) GetUserBuyFour(ctx context.Context, b *biz.Pagination, userId int64) ([]*biz.BuyRecordFour, error, int64) {
+	var (
+		rewards []*BuyRecordFour
+		count   int64
+	)
+	res := make([]*biz.BuyRecordFour, 0)
+
+	instance := ub.data.db.Table("buy_record_four")
+
+	if 0 < userId {
+		instance = instance.Where("user_id=?", userId)
+	}
+
+	instance = instance.Where("status=?", 1)
+
+	instance = instance.Count(&count)
+	if err := instance.Scopes(Paginate(b.PageNum, b.PageSize)).Order("id desc").Find(&rewards).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return res, errors.NotFound("REWARD_NOT_FOUND", "reward not found"), 0
+		}
+
+		return nil, errors.New(500, "REWARD ERROR", err.Error()), 0
+	}
+
+	for _, reward := range rewards {
+		res = append(res, &biz.BuyRecordFour{
+			ID:              reward.ID,
+			UserId:          reward.UserId,
+			Status:          reward.Status,
+			LastUpdated:     reward.LastUpdated,
+			Amount:          reward.Amount,
+			AmountGet:       reward.AmountGet,
+			AmountGetPerDay: reward.AmountGetPerDay,
+			CreatedAt:       reward.CreatedAt,
+			UpdatedAt:       reward.UpdatedAt,
+			One:             reward.One,
+			Two:             reward.Two,
+			Three:           reward.Three,
+			Four:            reward.Four,
 		})
 	}
 

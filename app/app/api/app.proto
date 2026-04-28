@@ -266,6 +266,12 @@ service App {
 		};
 	};
 
+	rpc AdminDailyRewardFour (AdminDailyRewardRequest) returns (AdminDailyRewardReply) {
+		option (google.api.http) = {
+			get: "/api/admin_dhb/daily_reward_four"
+		};
+	};
+
 	rpc AdminMyTotalAmount (AdminDailyRewardRequest) returns (AdminDailyRewardReply) {
 		option (google.api.http) = {
 			get: "/api/admin_dhb/check_my_total_amount"
@@ -513,6 +519,12 @@ service App {
 	rpc AdminBuyList (AdminBuyListRequest) returns (AdminBuyListReply) {
 		option (google.api.http) = {
 			get: "/api/admin_dhb/buy_list"
+		};
+	};
+
+	rpc AdminBuyFourList (AdminBuyListRequest) returns (AdminBuyListReply) {
+		option (google.api.http) = {
+			get: "/api/admin_dhb/buy_four_list"
 		};
 	};
 
