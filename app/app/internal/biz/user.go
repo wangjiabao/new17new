@@ -702,7 +702,7 @@ func (uuc *UserUseCase) AdminRewardList(ctx context.Context, req *v1.AdminReward
 		res.Rewards = append(res.Rewards, &v1.AdminRewardListReply_List{
 			CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 			Amount:     amountNew,
-			AmountNana: fmt.Sprintf("%.2f", vUserReward.AmountNewTwo),
+			AmountNana: fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
 			Address:    tmpUser,
 			Reason:     tmpReason,
 			Num:        tmpNum,   // 代数
