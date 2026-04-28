@@ -697,7 +697,7 @@ func (uuc *UserUseCase) AdminRewardList(ctx context.Context, req *v1.AdminReward
 
 		tmpLevel := vUserReward.BalanceRecordId
 		tmpNum := vUserReward.TypeRecordId
-		amountNew := fmt.Sprintf("%.2f", vUserReward.AmountNew)
+		amountNew := fmt.Sprintf("%.4f", vUserReward.AmountNew)
 
 		res.Rewards = append(res.Rewards, &v1.AdminRewardListReply_List{
 			CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
