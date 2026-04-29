@@ -3006,11 +3006,11 @@ func (uuc *UserUseCase) AdminWithdrawList(ctx context.Context, req *v1.AdminWith
 		res.Withdraw = append(res.Withdraw, &v1.AdminWithdrawListReply_List{
 			Id:        v.ID,
 			CreatedAt: v.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-			Amount:    fmt.Sprintf("%.2f", v.AmountNew),
+			Amount:    fmt.Sprintf("%.4f", v.AmountNew),
 			Status:    v.Status,
 			Type:      v.Type,
 			Address:   users[v.UserId].Address,
-			RelAmount: fmt.Sprintf("%.2f", v.RelAmountNew),
+			RelAmount: fmt.Sprintf("%.4f", v.RelAmountNew),
 		})
 	}
 
