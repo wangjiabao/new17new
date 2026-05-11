@@ -1411,6 +1411,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/admin_dhb/set_buy_four:
+        post:
+            tags:
+                - App
+            operationId: App_AdminSetBuyFour
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AdminSetIspayRequest_SendBody'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AdminSetIspayReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/admin_dhb/set_ispay:
         post:
             tags:
@@ -2111,6 +2135,12 @@ components:
                     type: string
                 four:
                     type: string
+                perDayAmount:
+                    type: string
+                amountGet:
+                    type: string
+                amountTotal:
+                    type: string
         AdminChangeAddressReply:
             type: object
             properties: {}
@@ -2415,7 +2445,9 @@ components:
                     type: string
         AdminSetIspayReply:
             type: object
-            properties: {}
+            properties:
+                status:
+                    type: string
         AdminSetIspayRequest_SendBody:
             type: object
             properties:
@@ -2508,6 +2540,10 @@ components:
                 balanceDhb:
                     type: string
                 bAmount:
+                    type: string
+                bAmountTwo:
+                    type: string
+                perDayAmount:
                     type: string
                 out:
                     type: string

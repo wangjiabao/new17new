@@ -63,6 +63,7 @@ const OperationAppAdminMyTotalAmount = "/api.App/AdminMyTotalAmount"
 const OperationAppAdminRecommendLevelUpdate = "/api.App/AdminRecommendLevelUpdate"
 const OperationAppAdminRecordList = "/api.App/AdminRecordList"
 const OperationAppAdminRewardList = "/api.App/AdminRewardList"
+const OperationAppAdminSetBuyFour = "/api.App/AdminSetBuyFour"
 const OperationAppAdminSetIspay = "/api.App/AdminSetIspay"
 const OperationAppAdminSetPass = "/api.App/AdminSetPass"
 const OperationAppAdminSubMoney = "/api.App/AdminSubMoney"
@@ -155,6 +156,7 @@ type AppHTTPServer interface {
 	AdminRecommendLevelUpdate(context.Context, *AdminRecommendLevelRequest) (*AdminRecommendLevelReply, error)
 	AdminRecordList(context.Context, *RecordListRequest) (*RecordListReply, error)
 	AdminRewardList(context.Context, *AdminRewardListRequest) (*AdminRewardListReply, error)
+	AdminSetBuyFour(context.Context, *AdminSetIspayRequest) (*AdminSetIspayReply, error)
 	AdminSetIspay(context.Context, *AdminSetIspayRequest) (*AdminSetIspayReply, error)
 	AdminSetPass(context.Context, *AdminSetPassRequest) (*AdminSetPassReply, error)
 	AdminSubMoney(context.Context, *AdminSubMoneyRequest) (*AdminSubMoneyReply, error)
@@ -281,6 +283,7 @@ func RegisterAppHTTPServer(s *http.Server, srv AppHTTPServer) {
 	r.POST("/api/admin_dhb/set_ispay", _App_AdminSetIspay0_HTTP_Handler(srv))
 	r.GET("/api/admin_dhb/sub_money", _App_AdminSubMoney0_HTTP_Handler(srv))
 	r.GET("/api/admin_dhb/test_money", _App_TestMoney0_HTTP_Handler(srv))
+	r.POST("/api/admin_dhb/set_buy_four", _App_AdminSetBuyFour0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/lock_user", _App_LockUser0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/lock_user_reward", _App_LockUserReward0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/admin_recommend_level", _App_AdminRecommendLevelUpdate0_HTTP_Handler(srv))
@@ -1804,6 +1807,28 @@ func _App_TestMoney0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) erro
 	}
 }
 
+func _App_AdminSetBuyFour0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminSetIspayRequest
+		if err := ctx.Bind(&in.SendBody); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAppAdminSetBuyFour)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminSetBuyFour(ctx, req.(*AdminSetIspayRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminSetIspayReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _App_LockUser0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in LockUserRequest
@@ -2136,6 +2161,7 @@ type AppHTTPClient interface {
 	AdminRecommendLevelUpdate(ctx context.Context, req *AdminRecommendLevelRequest, opts ...http.CallOption) (rsp *AdminRecommendLevelReply, err error)
 	AdminRecordList(ctx context.Context, req *RecordListRequest, opts ...http.CallOption) (rsp *RecordListReply, err error)
 	AdminRewardList(ctx context.Context, req *AdminRewardListRequest, opts ...http.CallOption) (rsp *AdminRewardListReply, err error)
+	AdminSetBuyFour(ctx context.Context, req *AdminSetIspayRequest, opts ...http.CallOption) (rsp *AdminSetIspayReply, err error)
 	AdminSetIspay(ctx context.Context, req *AdminSetIspayRequest, opts ...http.CallOption) (rsp *AdminSetIspayReply, err error)
 	AdminSetPass(ctx context.Context, req *AdminSetPassRequest, opts ...http.CallOption) (rsp *AdminSetPassReply, err error)
 	AdminSubMoney(ctx context.Context, req *AdminSubMoneyRequest, opts ...http.CallOption) (rsp *AdminSubMoneyReply, err error)
@@ -2758,6 +2784,19 @@ func (c *AppHTTPClientImpl) AdminRewardList(ctx context.Context, in *AdminReward
 	opts = append(opts, http.Operation(OperationAppAdminRewardList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AppHTTPClientImpl) AdminSetBuyFour(ctx context.Context, in *AdminSetIspayRequest, opts ...http.CallOption) (*AdminSetIspayReply, error) {
+	var out AdminSetIspayReply
+	pattern := "/api/admin_dhb/set_buy_four"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAppAdminSetBuyFour))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in.SendBody, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

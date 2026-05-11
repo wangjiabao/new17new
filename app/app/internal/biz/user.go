@@ -61,6 +61,7 @@ type User struct {
 	Six                    string
 	Seven                  string
 	AmountSelf             uint64
+	IspayNew               float64
 }
 
 type Stake struct {
@@ -521,6 +522,7 @@ type UserInfoRepo interface {
 	UpdateUserRewardAreaOne(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool, address string, i, cl int64, two bool) error
 	UpdateUserRewardRecommendNewTwo(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool, address string, i int64) error
 	UpdateUserRewardAllNew(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool) error
+	UpdateUserNewNewNewFour(ctx context.Context, userId int64, amount uint64, amountIspay, amountIspayPerDay float64, one, two, three string) error
 }
 
 type UserRepo interface {
@@ -868,6 +870,19 @@ func (uuc *UserUseCase) AdminUserList(ctx context.Context, req *v1.AdminUserList
 		}
 
 		var (
+			userBuysFour []*BuyRecordFour
+		)
+		userBuysFour, err, _ = uuc.ubRepo.GetUserBuyFour(ctx, nil, vUsers.ID)
+		if nil != err {
+			continue
+		}
+
+		var tmpFourAmountPerDay float64
+		for _, vBuyFour := range userBuysFour {
+			tmpFourAmountPerDay += vBuyFour.AmountGetPerDay
+		}
+
+		var (
 			userBuys []*BuyRecord
 		)
 		userBuys, err = uuc.ubRepo.GetUserBuyByUserId(ctx, vUsers.ID)
@@ -982,6 +997,8 @@ func (uuc *UserUseCase) AdminUserList(ctx context.Context, req *v1.AdminUserList
 			BalanceUsdt:        fmt.Sprintf("%.2f", userBalances[vUsers.ID].BalanceUsdtFloat),
 			BalanceDhb:         fmt.Sprintf("%.2f", userBalances[vUsers.ID].BalanceRawFloat),
 			BAmount:            fmt.Sprintf("%.2f", userBalances[vUsers.ID].BalanceRawFloatNew),
+			BAmountTwo:         fmt.Sprintf("%.4f", vUsers.IspayNew),
+			PerDayAmount:       fmt.Sprintf("%.4f", tmpFourAmountPerDay),
 			Vip:                currentLevel,
 			Out:                vUsers.OutRate,
 			HistoryRecommend:   tmpMyRecommendUserIdsLen,
@@ -1082,14 +1099,17 @@ func (uuc *UserUseCase) AdminBuyFourList(ctx context.Context, req *v1.AdminBuyLi
 		}
 
 		res.Rewards = append(res.Rewards, &v1.AdminBuyListReply_List{
-			CreatedAt: vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-			Amount:    strconv.FormatInt(vUserReward.Four, 10),
-			Address:   tmpUser,
-			Id:        vUserReward.ID,
-			One:       fourTmp,
-			Two:       oneTmp,
-			Three:     twoTmp,
-			Four:      threeTmp,
+			CreatedAt:    vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
+			Amount:       strconv.FormatInt(vUserReward.Four, 10),
+			Address:      tmpUser,
+			Id:           vUserReward.ID,
+			One:          fourTmp,
+			Two:          oneTmp,
+			Three:        twoTmp,
+			Four:         threeTmp,
+			AmountTotal:  fmt.Sprintf("%.4f", vUserReward.Amount),
+			AmountGet:    fmt.Sprintf("%.4f", vUserReward.AmountGet),
+			PerDayAmount: fmt.Sprintf("%.4f", vUserReward.AmountGetPerDay),
 		})
 	}
 
@@ -10154,6 +10174,146 @@ func (uuc *UserUseCase) AdminSetIspay(ctx context.Context, req *v1.AdminSetIspay
 		}); nil != err {
 			return nil, err
 		}
+	}
+
+	return nil, nil
+}
+
+func (uuc *UserUseCase) AdminSetBuyFour(ctx context.Context, req *v1.AdminSetIspayRequest) (*v1.AdminSetIspayReply, error) {
+	// 推荐人
+	var (
+		err        error
+		configs    []*Config
+		priceOne   float64
+		priceTwo   float64
+		priceThree float64
+		//recommendRate    float64
+		//recommendRateTwo float64
+	)
+
+	var (
+		user *User
+	)
+	user, err = uuc.repo.GetUserByAddressTwo(ctx, req.SendBody.Address)
+	if nil != err {
+		return nil, nil
+	}
+
+	// 配置
+	configs, err = uuc.configRepo.GetConfigByKeys(ctx,
+		"b_price_three_one",
+		"b_price_three_two",
+		"b_price_three_three",
+		"recommend_reward_rate_one",
+		"recommend_reward_rate_two",
+	)
+	if nil != err || nil == configs {
+		return &v1.AdminSetIspayReply{
+			Status: "稍后重试|err wait",
+		}, nil
+	}
+
+	for _, vConfig := range configs {
+		if "b_price_three_one" == vConfig.KeyName {
+			priceOne, _ = strconv.ParseFloat(vConfig.Value, 10)
+		}
+		if "b_price_three_two" == vConfig.KeyName {
+			priceTwo, _ = strconv.ParseFloat(vConfig.Value, 10)
+		}
+		if "b_price_three_three" == vConfig.KeyName {
+			priceThree, _ = strconv.ParseFloat(vConfig.Value, 10)
+		}
+		//if "recommend_reward_rate_one" == vConfig.KeyName {
+		//	recommendRate, _ = strconv.ParseFloat(vConfig.Value, 10)
+		//}
+		//if "recommend_reward_rate_two" == vConfig.KeyName {
+		//	recommendRateTwo, _ = strconv.ParseFloat(vConfig.Value, 10)
+		//}
+	}
+
+	amount := req.SendBody.Amount
+	amountIspay := float64(0)
+	amountIspayPerDay := float64(0)
+	price := float64(0)
+	if 100 <= amount && 4000 >= amount {
+		price = priceOne
+		amountIspay = float64(amount) / price
+		amountIspayPerDay = amountIspay / 300
+	} else if 4500 <= amount && 10000 >= amount {
+		price = priceTwo
+		amountIspay = float64(amount) / price
+		amountIspayPerDay = amountIspay / 600
+	} else if 12000 <= amount && 100000 >= amount {
+		price = priceThree
+		amountIspay = float64(amount) / price
+		amountIspayPerDay = amountIspay / 750
+	} else {
+		return &v1.AdminSetIspayReply{
+			Status: "参数错误 |err amount",
+		}, nil
+	}
+
+	if 0.000001 >= price || 0.000001 >= amountIspayPerDay || 0.000001 >= amountIspay {
+		return &v1.AdminSetIspayReply{
+			Status: "参数错误 |err amount",
+		}, nil
+	}
+
+	//var (
+	//	users    []*User
+	//	usersMap map[int64]*User
+	//)
+	//users, err = uuc.ubRepo.GetAllUsersB(ctx)
+	//if nil == users {
+	//	return &v1.AdminSetIspayReply{
+	//		Status: "参数错误 |err id",
+	//	}, nil
+	//}
+	//
+	//usersMap = make(map[int64]*User, 0)
+	//for _, vUsers := range users {
+	//	usersMap[vUsers.ID] = vUsers
+	//}
+	//
+	//if _, ok := usersMap[user.ID]; !ok {
+	//	fmt.Println("不存在用户")
+	//	return &v1.AdminSetIspayReply{
+	//		Status: "参数错误 |err id",
+	//	}, nil
+	//}
+	//user = usersMap[user.ID]
+
+	//var (
+	//	amountRel   = float64(amount)
+	//	userBalance *UserBalance
+	//)
+	//
+	//userBalance, err = uuc.ubRepo.GetUserBalance(ctx, user.ID)
+	//if nil == userBalance || nil != err {
+	//	return &v1.BuyReply{
+	//		Status: "参数错误 |err id",
+	//	}, nil
+	//}
+	//
+	//if amountRel > userBalance.BalanceUsdtFloat {
+	//	return &v1.BuyReply{
+	//		Status: "usdt余额不足|deposit usdt not enough",
+	//	}, nil
+	//}
+
+	// 入金
+	if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+		err = uuc.uiRepo.UpdateUserNewNewNewFour(ctx, user.ID, amount, amountIspay, amountIspayPerDay, "", "", "")
+		if nil != err {
+			return err
+		}
+
+		return nil
+	}); nil != err {
+		fmt.Println(err, "错误投资4", amount)
+		return &v1.AdminSetIspayReply{
+			Status: "参数错误 |err id",
+		}, nil
 	}
 
 	return nil, nil

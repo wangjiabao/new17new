@@ -1231,6 +1231,10 @@ func (a *AppService) AdminSetIspay(ctx context.Context, req *v1.AdminSetIspayReq
 	return a.uuc.AdminSetIspay(ctx, req)
 }
 
+func (a *AppService) AdminSetBuyFour(ctx context.Context, req *v1.AdminSetIspayRequest) (*v1.AdminSetIspayReply, error) {
+	return a.uuc.AdminSetBuyFour(ctx, req)
+}
+
 // AdminSubMoney  .
 func (a *AppService) AdminSubMoney(ctx context.Context, req *v1.AdminSubMoneyRequest) (*v1.AdminSubMoneyReply, error) {
 	return a.uuc.AdminSubMoney(ctx, req)

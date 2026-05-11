@@ -51,6 +51,7 @@ type User struct {
 	SixNew                 string    `gorm:"type:varchar(200)"`
 	SevenNew               string    `gorm:"type:varchar(200)"`
 	AmountSelf             uint64    `gorm:"type:bigint;not null"`
+	IspayNew               float64   `gorm:"type:decimal(65,20);not null"`
 }
 
 type Stake struct {
@@ -1055,6 +1056,7 @@ func (u *UserRepo) GetUsers(ctx context.Context, b *biz.Pagination, address stri
 			LockReward:       item.LockReward,
 			AmountFourGet:    item.AmountFourGet,
 			AmountFour:       item.AmountFour,
+			IspayNew:         item.IspayNew,
 		})
 	}
 	return res, nil, count
@@ -3233,6 +3235,66 @@ func (ui *UserInfoRepo) UpdateUserRewardDailyIspay(ctx context.Context, id, user
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// UpdateUserNewNewNewFour .
+func (ui *UserInfoRepo) UpdateUserNewNewNewFour(ctx context.Context, userId int64, amount uint64, amountIspay, amountIspayPerDay float64, one, two, three string) error {
+	res := ui.data.DB(ctx).Table("user").Where("id=?", userId).
+		Updates(map[string]interface{}{
+			"amount_four_new":       gorm.Expr("amount_four_new + ?", amount),
+			"amount_four_new_ispay": gorm.Expr("amount_four_new_ispay + ?", amountIspay),
+		})
+	if res.Error != nil || 1 != res.RowsAffected {
+		return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+	}
+
+	//res = ui.data.DB(ctx).Table("user_balance").
+	//	Where("user_id=?", userId).Where("balance_usdt_float>=?", amount).
+	//	Updates(map[string]interface{}{
+	//		"balance_usdt_float": gorm.Expr("balance_usdt_float - ?", amount),
+	//	})
+	//if res.Error != nil || 1 != res.RowsAffected {
+	//	return errors.New(500, "UPDATE_USER_ERROR", "one信息修改失败")
+	//}
+	//
+	//res = ui.data.DB(ctx).Table("total").Where("id=?", 1).
+	//	Updates(map[string]interface{}{"one": gorm.Expr("one + ?", amount)})
+	//if res.Error != nil || 1 != res.RowsAffected {
+	//	return errors.New(500, "UPDATE_USER_ERROR", "one信息修改失败")
+	//}
+
+	var buyRecord BuyRecordFour
+	buyRecord.UserId = userId
+	buyRecord.Amount = amountIspay
+	buyRecord.AmountGet = float64(0)
+	buyRecord.AmountGetPerDay = amountIspayPerDay
+	buyRecord.Status = 1
+	buyRecord.LastUpdated = time.Now().UTC().Unix()
+	buyRecord.One = one
+	buyRecord.Two = two
+	buyRecord.Three = three
+	buyRecord.Four = int64(amount)
+
+	res = ui.data.DB(ctx).Table("buy_record_four").Create(&buyRecord)
+	if res.Error != nil || 1 != res.RowsAffected {
+		return errors.New(500, "CREATE_LOCATION_ERROR", "占位信息创建失败")
+	}
+
+	var (
+		reward Reward
+	)
+
+	reward.UserId = userId
+	reward.AmountNew = float64(amount)
+	reward.AmountNewTwo = amountIspay
+	reward.Type = "USDT"       // 本次分红的行为类型
+	reward.Reason = "buy_four" // 给我分红的理由
+	res = ui.data.DB(ctx).Table("reward").Create(&reward)
+	if res.Error != nil || 1 != res.RowsAffected {
+		return errors.New(500, "CREATE_LOCATION_ERROR", "占位信息创建失败")
 	}
 
 	return nil
@@ -6728,7 +6790,11 @@ func (ub *UserBalanceRepo) GetUserBuyFour(ctx context.Context, b *biz.Pagination
 	instance = instance.Where("status=?", 1)
 
 	instance = instance.Count(&count)
-	if err := instance.Scopes(Paginate(b.PageNum, b.PageSize)).Order("id desc").Find(&rewards).Error; err != nil {
+	if nil != b {
+		instance = instance.Scopes(Paginate(b.PageNum, b.PageSize)).Order("id desc")
+	}
+
+	if err := instance.Find(&rewards).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return res, errors.NotFound("REWARD_NOT_FOUND", "reward not found"), 0
 		}

@@ -495,6 +495,13 @@ service App {
 		};
 	};
 
+	rpc AdminSetBuyFour(AdminSetIspayRequest) returns (AdminSetIspayReply) {
+		option (google.api.http) = {
+			post: "/api/admin_dhb/set_buy_four"
+			body: "send_body"
+		};
+	};
+
 	rpc LockUser(LockUserRequest) returns (LockUserReply) {
 		option (google.api.http) = {
 			post: "/api/admin_dhb/lock_user"
@@ -618,6 +625,7 @@ message AdminSetIspayRequest {
 }
 
 message AdminSetIspayReply {
+	string status = 1;
 }
 
 
@@ -853,6 +861,8 @@ message AdminUserListReply { // 用户信息
 		string balanceUsdt = 3; // usdt数量
 		string balanceDhb = 4; // ispay数量
 		string bAmount = 16; // ispay数量
+		string bAmountTwo = 17; // ispay数量
+		string perDayAmount = 18; // ispay数量
 		int64 out = 7; // 出局次数
 		double areaTotal = 9; // 总业绩
 		double areaMin = 10; // 小区
@@ -883,6 +893,9 @@ message AdminBuyListReply {
 		string two = 7; // 收货地址
 		string three = 8; // 收件人手机号
 		string four = 9; // 收件人
+		string perDayAmount = 11;
+		string amountGet = 12;
+		string amountTotal = 13;
 	}
 	int64 count = 2;
 }
