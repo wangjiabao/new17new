@@ -96,6 +96,7 @@ const (
 	App_AdminSubMoney_FullMethodName                        = "/api.App/AdminSubMoney"
 	App_TestMoney_FullMethodName                            = "/api.App/TestMoney"
 	App_AdminSetBuyFour_FullMethodName                      = "/api.App/AdminSetBuyFour"
+	App_AdminUpdateBuyFour_FullMethodName                   = "/api.App/AdminUpdateBuyFour"
 	App_LockUser_FullMethodName                             = "/api.App/LockUser"
 	App_LockUserReward_FullMethodName                       = "/api.App/LockUserReward"
 	App_AdminRecommendLevelUpdate_FullMethodName            = "/api.App/AdminRecommendLevelUpdate"
@@ -193,6 +194,7 @@ type AppClient interface {
 	AdminSubMoney(ctx context.Context, in *AdminSubMoneyRequest, opts ...grpc.CallOption) (*AdminSubMoneyReply, error)
 	TestMoney(ctx context.Context, in *TestMoneyRequest, opts ...grpc.CallOption) (*TestMoneyReply, error)
 	AdminSetBuyFour(ctx context.Context, in *AdminSetIspayRequest, opts ...grpc.CallOption) (*AdminSetIspayReply, error)
+	AdminUpdateBuyFour(ctx context.Context, in *AdminUpdateBuyFourRequest, opts ...grpc.CallOption) (*AdminUpdateBuyFourReply, error)
 	LockUser(ctx context.Context, in *LockUserRequest, opts ...grpc.CallOption) (*LockUserReply, error)
 	LockUserReward(ctx context.Context, in *LockUserRewardRequest, opts ...grpc.CallOption) (*LockUserRewardReply, error)
 	AdminRecommendLevelUpdate(ctx context.Context, in *AdminRecommendLevelRequest, opts ...grpc.CallOption) (*AdminRecommendLevelReply, error)
@@ -910,6 +912,15 @@ func (c *appClient) AdminSetBuyFour(ctx context.Context, in *AdminSetIspayReques
 	return out, nil
 }
 
+func (c *appClient) AdminUpdateBuyFour(ctx context.Context, in *AdminUpdateBuyFourRequest, opts ...grpc.CallOption) (*AdminUpdateBuyFourReply, error) {
+	out := new(AdminUpdateBuyFourReply)
+	err := c.cc.Invoke(ctx, App_AdminUpdateBuyFour_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appClient) LockUser(ctx context.Context, in *LockUserRequest, opts ...grpc.CallOption) (*LockUserReply, error) {
 	out := new(LockUserReply)
 	err := c.cc.Invoke(ctx, App_LockUser_FullMethodName, in, out, opts...)
@@ -1117,6 +1128,7 @@ type AppServer interface {
 	AdminSubMoney(context.Context, *AdminSubMoneyRequest) (*AdminSubMoneyReply, error)
 	TestMoney(context.Context, *TestMoneyRequest) (*TestMoneyReply, error)
 	AdminSetBuyFour(context.Context, *AdminSetIspayRequest) (*AdminSetIspayReply, error)
+	AdminUpdateBuyFour(context.Context, *AdminUpdateBuyFourRequest) (*AdminUpdateBuyFourReply, error)
 	LockUser(context.Context, *LockUserRequest) (*LockUserReply, error)
 	LockUserReward(context.Context, *LockUserRewardRequest) (*LockUserRewardReply, error)
 	AdminRecommendLevelUpdate(context.Context, *AdminRecommendLevelRequest) (*AdminRecommendLevelReply, error)
@@ -1368,6 +1380,9 @@ func (UnimplementedAppServer) TestMoney(context.Context, *TestMoneyRequest) (*Te
 }
 func (UnimplementedAppServer) AdminSetBuyFour(context.Context, *AdminSetIspayRequest) (*AdminSetIspayReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminSetBuyFour not implemented")
+}
+func (UnimplementedAppServer) AdminUpdateBuyFour(context.Context, *AdminUpdateBuyFourRequest) (*AdminUpdateBuyFourReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminUpdateBuyFour not implemented")
 }
 func (UnimplementedAppServer) LockUser(context.Context, *LockUserRequest) (*LockUserReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LockUser not implemented")
@@ -2810,6 +2825,24 @@ func _App_AdminSetBuyFour_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _App_AdminUpdateBuyFour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUpdateBuyFourRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).AdminUpdateBuyFour(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: App_AdminUpdateBuyFour_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).AdminUpdateBuyFour(ctx, req.(*AdminUpdateBuyFourRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _App_LockUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LockUserRequest)
 	if err := dec(in); err != nil {
@@ -3376,6 +3409,10 @@ var App_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdminSetBuyFour",
 			Handler:    _App_AdminSetBuyFour_Handler,
+		},
+		{
+			MethodName: "AdminUpdateBuyFour",
+			Handler:    _App_AdminUpdateBuyFour_Handler,
 		},
 		{
 			MethodName: "LockUser",

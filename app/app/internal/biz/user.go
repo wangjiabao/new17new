@@ -523,6 +523,7 @@ type UserInfoRepo interface {
 	UpdateUserRewardRecommendNewTwo(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool, address string, i int64) error
 	UpdateUserRewardAllNew(ctx context.Context, id, userId int64, usdt, raw, usdtOrigin float64, amountOrigin float64, stop bool) error
 	UpdateUserNewNewNewFour(ctx context.Context, userId int64, amount uint64, amountIspay, amountIspayPerDay float64, one, two, three string) error
+	UpdateAddUserNewNewNewFour(ctx context.Context, userId, id int64, amount uint64, amountIspay, amountIspayPerDay float64) error
 }
 
 type UserRepo interface {
@@ -10312,6 +10313,37 @@ func (uuc *UserUseCase) AdminSetBuyFour(ctx context.Context, req *v1.AdminSetIsp
 	}); nil != err {
 		fmt.Println(err, "错误投资4", amount)
 		return &v1.AdminSetIspayReply{
+			Status: "参数错误 |err id",
+		}, nil
+	}
+
+	return nil, nil
+}
+
+func (uuc *UserUseCase) AdminUpdateBuyFour(ctx context.Context, req *v1.AdminUpdateBuyFourRequest) (*v1.AdminUpdateBuyFourReply, error) {
+
+	var (
+		err error
+	)
+	var (
+		user *User
+	)
+	user, err = uuc.repo.GetUserByAddressTwo(ctx, req.SendBody.Address)
+	if nil != err {
+		return nil, nil
+	}
+
+	// 入金
+	if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+		err = uuc.uiRepo.UpdateAddUserNewNewNewFour(ctx, user.ID, int64(req.SendBody.Id), uint64(req.SendBody.AmountOne), req.SendBody.AmountTwo, req.SendBody.AmountThree)
+		if nil != err {
+			return err
+		}
+
+		return nil
+	}); nil != err {
+		fmt.Println(err, "错误修改44")
+		return &v1.AdminUpdateBuyFourReply{
 			Status: "参数错误 |err id",
 		}, nil
 	}

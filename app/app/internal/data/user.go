@@ -3240,6 +3240,30 @@ func (ui *UserInfoRepo) UpdateUserRewardDailyIspay(ctx context.Context, id, user
 	return nil
 }
 
+// UpdateAddUserNewNewNewFour .
+func (ui *UserInfoRepo) UpdateAddUserNewNewNewFour(ctx context.Context, userId, id int64, amount uint64, amountIspay, amountIspayPerDay float64) error {
+	res := ui.data.DB(ctx).Table("user").Where("id=?", userId).
+		Updates(map[string]interface{}{
+			"amount_four_new":       gorm.Expr("amount_four_new + ?", amount),
+			"amount_four_new_ispay": gorm.Expr("amount_four_new_ispay + ?", amountIspay),
+		})
+	if res.Error != nil || 1 != res.RowsAffected {
+		return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+	}
+
+	resTwo := ui.data.DB(ctx).Table("buy_record_four").Where("id=?", id).
+		Updates(map[string]interface{}{
+			"amount":             gorm.Expr("amount + ?", amountIspay),
+			"amount_get_per_day": amountIspayPerDay,
+			"four":               gorm.Expr("four + ?", amount),
+		})
+	if resTwo.Error != nil || 1 != resTwo.RowsAffected {
+		return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+	}
+
+	return nil
+}
+
 // UpdateUserNewNewNewFour .
 func (ui *UserInfoRepo) UpdateUserNewNewNewFour(ctx context.Context, userId int64, amount uint64, amountIspay, amountIspayPerDay float64, one, two, three string) error {
 	res := ui.data.DB(ctx).Table("user").Where("id=?", userId).

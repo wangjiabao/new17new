@@ -502,6 +502,13 @@ service App {
 		};
 	};
 
+	rpc AdminUpdateBuyFour(AdminUpdateBuyFourRequest) returns (AdminUpdateBuyFourReply) {
+		option (google.api.http) = {
+			post: "/api/admin_dhb/update_buy_four"
+			body: "send_body"
+		};
+	};
+
 	rpc LockUser(LockUserRequest) returns (LockUserReply) {
 		option (google.api.http) = {
 			post: "/api/admin_dhb/lock_user"
@@ -628,6 +635,21 @@ message AdminSetIspayReply {
 	string status = 1;
 }
 
+
+message AdminUpdateBuyFourRequest {
+	message SendBody {
+		uint64 id = 4;
+		double amountOne = 1;
+		double amountTwo = 2;
+		double amountThree = 5;
+		string address = 3;
+	}
+	SendBody send_body = 1;
+}
+
+message AdminUpdateBuyFourReply {
+	string status = 1;
+}
 
 message EthAuthorizeRequest {
 	message SendBody{

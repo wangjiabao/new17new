@@ -1593,6 +1593,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/admin_dhb/update_buy_four:
+        post:
+            tags:
+                - App
+            operationId: App_AdminUpdateBuyFour
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AdminUpdateBuyFourRequest_SendBody'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AdminUpdateBuyFourReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/admin_dhb/update_goods:
         post:
             tags:
@@ -2500,6 +2524,27 @@ components:
                 userId:
                     type: string
                 undo:
+                    type: string
+        AdminUpdateBuyFourReply:
+            type: object
+            properties:
+                status:
+                    type: string
+        AdminUpdateBuyFourRequest_SendBody:
+            type: object
+            properties:
+                id:
+                    type: string
+                amountOne:
+                    type: number
+                    format: double
+                amountTwo:
+                    type: number
+                    format: double
+                amountThree:
+                    type: number
+                    format: double
+                address:
                     type: string
         AdminUpdateLocationNewMaxReply:
             type: object
