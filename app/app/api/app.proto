@@ -502,9 +502,15 @@ service App {
 		};
 	};
 
-	rpc AdminUpdateBuyFour(AdminUpdateBuyFourRequest) returns (AdminUpdateBuyFourReply) {
+	rpc TestMoneyFour(TestMoneyRequest) returns (TestMoneyReply) {
 		option (google.api.http) = {
-			post: "/api/admin_dhb/update_buy_four"
+			get: "/api/admin_dhb/test_money_four"
+		};
+	};
+
+	rpc AdminUpdateBuyFourAmount(AdminUpdateBuyFourRequest) returns (AdminUpdateBuyFourReply) {
+		option (google.api.http) = {
+			post: "/api/admin_dhb/update_amount_four"
 			body: "send_body"
 		};
 	};

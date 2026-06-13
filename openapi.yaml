@@ -1524,6 +1524,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/admin_dhb/test_money_four:
+        get:
+            tags:
+                - App
+            operationId: App_TestMoneyFour
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TestMoneyReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/admin_dhb/trade:
         get:
             tags:
@@ -1593,11 +1611,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/admin_dhb/update_buy_four:
+    /api/admin_dhb/update_amount_four:
         post:
             tags:
                 - App
-            operationId: App_AdminUpdateBuyFour
+            operationId: App_AdminUpdateBuyFourAmount
             requestBody:
                 content:
                     application/json:

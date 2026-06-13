@@ -10320,6 +10320,84 @@ func (uuc *UserUseCase) AdminSetBuyFour(ctx context.Context, req *v1.AdminSetIsp
 	return nil, nil
 }
 
+func (uuc *UserUseCase) TestMoneyFour(ctx context.Context, req *v1.TestMoneyRequest) (*v1.TestMoneyReply, error) {
+
+	var (
+		err error
+		rF  []*BuyRecordFour
+	)
+
+	rF, err = uuc.uiRepo.GetBuyRecordFour(ctx)
+	if nil != err {
+		return nil, err
+	}
+
+	var (
+		users    []*User
+		usersMap map[int64]*User
+	)
+	users, err = uuc.ubRepo.GetAllUsersB(ctx)
+	if nil == users {
+		return nil, err
+	}
+
+	usersMap = make(map[int64]*User, 0)
+	for _, vUsers := range users {
+		usersMap[vUsers.ID] = vUsers
+	}
+
+	for _, v := range rF {
+
+		// 推荐人
+		var (
+			userRecommend       *UserRecommend
+			tmpRecommendUserIds []string
+		)
+		userRecommend, err = uuc.urRepo.GetUserRecommendByUserId(ctx, v.UserId)
+		if nil != err {
+			return nil, err
+		}
+		if "" != userRecommend.RecommendCode {
+			tmpRecommendUserIds = strings.Split(userRecommend.RecommendCode, "D")
+		}
+
+		totalTmp := len(tmpRecommendUserIds) - 1
+		tmpNum := int64(0)
+		for i := totalTmp; i >= 0; i-- {
+			tmpNum++
+			if 11 > tmpNum {
+				continue
+			}
+
+			tmpUserId, _ := strconv.ParseInt(tmpRecommendUserIds[i], 10, 64) // 最后一位是直推人
+			if 0 >= tmpUserId {
+				continue
+			}
+
+			if _, ok := usersMap[tmpUserId]; !ok {
+				fmt.Println("buy遍历，信息缺失,user：", err, tmpUserId)
+				continue
+			}
+
+			fmt.Println("补", tmpUserId, v.Four)
+			// 增加业绩
+			//if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+			//	err = uuc.uiRepo.UpdateUserMyTotalAmountAdd(ctx, tmpUserId, float64(v.Four), 0)
+			//	if err != nil {
+			//		return err
+			//	}
+			//
+			//	return nil
+			//}); nil != err {
+			//	fmt.Println("遍历业绩：", err, tmpUserId, v)
+			//	continue
+			//}
+		}
+	}
+
+	return nil, nil
+}
+
 func (uuc *UserUseCase) AdminUpdateBuyFour(ctx context.Context, req *v1.AdminUpdateBuyFourRequest) (*v1.AdminUpdateBuyFourReply, error) {
 
 	var (

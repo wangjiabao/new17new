@@ -70,7 +70,7 @@ const OperationAppAdminSubMoney = "/api.App/AdminSubMoney"
 const OperationAppAdminTrade = "/api.App/AdminTrade"
 const OperationAppAdminTradeList = "/api.App/AdminTradeList"
 const OperationAppAdminUndoUpdate = "/api.App/AdminUndoUpdate"
-const OperationAppAdminUpdateBuyFour = "/api.App/AdminUpdateBuyFour"
+const OperationAppAdminUpdateBuyFourAmount = "/api.App/AdminUpdateBuyFourAmount"
 const OperationAppAdminUpdateLocationNewMax = "/api.App/AdminUpdateLocationNewMax"
 const OperationAppAdminUserList = "/api.App/AdminUserList"
 const OperationAppAdminUserPasswordUpdate = "/api.App/AdminUserPasswordUpdate"
@@ -106,6 +106,7 @@ const OperationAppRecommendList = "/api.App/RecommendList"
 const OperationAppRecommendRewardList = "/api.App/RecommendRewardList"
 const OperationAppRewardList = "/api.App/RewardList"
 const OperationAppTestMoney = "/api.App/TestMoney"
+const OperationAppTestMoneyFour = "/api.App/TestMoneyFour"
 const OperationAppUserAuthList = "/api.App/UserAuthList"
 const OperationAppUserInfo = "/api.App/UserInfo"
 const OperationAppVipCheck = "/api.App/VipCheck"
@@ -164,7 +165,7 @@ type AppHTTPServer interface {
 	AdminTrade(context.Context, *AdminTradeRequest) (*AdminTradeReply, error)
 	AdminTradeList(context.Context, *AdminTradeListRequest) (*AdminTradeListReply, error)
 	AdminUndoUpdate(context.Context, *AdminUndoUpdateRequest) (*AdminUndoUpdateReply, error)
-	AdminUpdateBuyFour(context.Context, *AdminUpdateBuyFourRequest) (*AdminUpdateBuyFourReply, error)
+	AdminUpdateBuyFourAmount(context.Context, *AdminUpdateBuyFourRequest) (*AdminUpdateBuyFourReply, error)
 	AdminUpdateLocationNewMax(context.Context, *AdminUpdateLocationNewMaxRequest) (*AdminUpdateLocationNewMaxReply, error)
 	AdminUserList(context.Context, *AdminUserListRequest) (*AdminUserListReply, error)
 	AdminUserPasswordUpdate(context.Context, *AdminPasswordUpdateRequest) (*AdminPasswordUpdateReply, error)
@@ -200,6 +201,7 @@ type AppHTTPServer interface {
 	RecommendRewardList(context.Context, *RecommendRewardListRequest) (*RecommendRewardListReply, error)
 	RewardList(context.Context, *RewardListRequest) (*RewardListReply, error)
 	TestMoney(context.Context, *TestMoneyRequest) (*TestMoneyReply, error)
+	TestMoneyFour(context.Context, *TestMoneyRequest) (*TestMoneyReply, error)
 	UserAuthList(context.Context, *UserAuthListRequest) (*UserAuthListReply, error)
 	UserInfo(context.Context, *UserInfoRequest) (*UserInfoReply, error)
 	VipCheck(context.Context, *VipCheckRequest) (*VipCheckReply, error)
@@ -286,7 +288,8 @@ func RegisterAppHTTPServer(s *http.Server, srv AppHTTPServer) {
 	r.GET("/api/admin_dhb/sub_money", _App_AdminSubMoney0_HTTP_Handler(srv))
 	r.GET("/api/admin_dhb/test_money", _App_TestMoney0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/set_buy_four", _App_AdminSetBuyFour0_HTTP_Handler(srv))
-	r.POST("/api/admin_dhb/update_buy_four", _App_AdminUpdateBuyFour0_HTTP_Handler(srv))
+	r.GET("/api/admin_dhb/test_money_four", _App_TestMoneyFour0_HTTP_Handler(srv))
+	r.POST("/api/admin_dhb/update_amount_four", _App_AdminUpdateBuyFourAmount0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/lock_user", _App_LockUser0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/lock_user_reward", _App_LockUserReward0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/admin_recommend_level", _App_AdminRecommendLevelUpdate0_HTTP_Handler(srv))
@@ -1832,7 +1835,26 @@ func _App_AdminSetBuyFour0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context
 	}
 }
 
-func _App_AdminUpdateBuyFour0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
+func _App_TestMoneyFour0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in TestMoneyRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAppTestMoneyFour)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TestMoneyFour(ctx, req.(*TestMoneyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TestMoneyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _App_AdminUpdateBuyFourAmount0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in AdminUpdateBuyFourRequest
 		if err := ctx.Bind(&in.SendBody); err != nil {
@@ -1841,9 +1863,9 @@ func _App_AdminUpdateBuyFour0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Cont
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationAppAdminUpdateBuyFour)
+		http.SetOperation(ctx, OperationAppAdminUpdateBuyFourAmount)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.AdminUpdateBuyFour(ctx, req.(*AdminUpdateBuyFourRequest))
+			return srv.AdminUpdateBuyFourAmount(ctx, req.(*AdminUpdateBuyFourRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -2193,7 +2215,7 @@ type AppHTTPClient interface {
 	AdminTrade(ctx context.Context, req *AdminTradeRequest, opts ...http.CallOption) (rsp *AdminTradeReply, err error)
 	AdminTradeList(ctx context.Context, req *AdminTradeListRequest, opts ...http.CallOption) (rsp *AdminTradeListReply, err error)
 	AdminUndoUpdate(ctx context.Context, req *AdminUndoUpdateRequest, opts ...http.CallOption) (rsp *AdminUndoUpdateReply, err error)
-	AdminUpdateBuyFour(ctx context.Context, req *AdminUpdateBuyFourRequest, opts ...http.CallOption) (rsp *AdminUpdateBuyFourReply, err error)
+	AdminUpdateBuyFourAmount(ctx context.Context, req *AdminUpdateBuyFourRequest, opts ...http.CallOption) (rsp *AdminUpdateBuyFourReply, err error)
 	AdminUpdateLocationNewMax(ctx context.Context, req *AdminUpdateLocationNewMaxRequest, opts ...http.CallOption) (rsp *AdminUpdateLocationNewMaxReply, err error)
 	AdminUserList(ctx context.Context, req *AdminUserListRequest, opts ...http.CallOption) (rsp *AdminUserListReply, err error)
 	AdminUserPasswordUpdate(ctx context.Context, req *AdminPasswordUpdateRequest, opts ...http.CallOption) (rsp *AdminPasswordUpdateReply, err error)
@@ -2229,6 +2251,7 @@ type AppHTTPClient interface {
 	RecommendRewardList(ctx context.Context, req *RecommendRewardListRequest, opts ...http.CallOption) (rsp *RecommendRewardListReply, err error)
 	RewardList(ctx context.Context, req *RewardListRequest, opts ...http.CallOption) (rsp *RewardListReply, err error)
 	TestMoney(ctx context.Context, req *TestMoneyRequest, opts ...http.CallOption) (rsp *TestMoneyReply, err error)
+	TestMoneyFour(ctx context.Context, req *TestMoneyRequest, opts ...http.CallOption) (rsp *TestMoneyReply, err error)
 	UserAuthList(ctx context.Context, req *UserAuthListRequest, opts ...http.CallOption) (rsp *UserAuthListReply, err error)
 	UserInfo(ctx context.Context, req *UserInfoRequest, opts ...http.CallOption) (rsp *UserInfoReply, err error)
 	VipCheck(ctx context.Context, req *VipCheckRequest, opts ...http.CallOption) (rsp *VipCheckReply, err error)
@@ -2907,11 +2930,11 @@ func (c *AppHTTPClientImpl) AdminUndoUpdate(ctx context.Context, in *AdminUndoUp
 	return &out, err
 }
 
-func (c *AppHTTPClientImpl) AdminUpdateBuyFour(ctx context.Context, in *AdminUpdateBuyFourRequest, opts ...http.CallOption) (*AdminUpdateBuyFourReply, error) {
+func (c *AppHTTPClientImpl) AdminUpdateBuyFourAmount(ctx context.Context, in *AdminUpdateBuyFourRequest, opts ...http.CallOption) (*AdminUpdateBuyFourReply, error) {
 	var out AdminUpdateBuyFourReply
-	pattern := "/api/admin_dhb/update_buy_four"
+	pattern := "/api/admin_dhb/update_amount_four"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationAppAdminUpdateBuyFour))
+	opts = append(opts, http.Operation(OperationAppAdminUpdateBuyFourAmount))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in.SendBody, &out, opts...)
 	if err != nil {
@@ -3367,6 +3390,19 @@ func (c *AppHTTPClientImpl) TestMoney(ctx context.Context, in *TestMoneyRequest,
 	pattern := "/api/admin_dhb/test_money"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAppTestMoney))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AppHTTPClientImpl) TestMoneyFour(ctx context.Context, in *TestMoneyRequest, opts ...http.CallOption) (*TestMoneyReply, error) {
+	var out TestMoneyReply
+	pattern := "/api/admin_dhb/test_money_four"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAppTestMoneyFour))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
