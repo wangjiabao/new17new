@@ -1611,7 +1611,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/admin_dhb/update_amount_four:
+    /api/admin_dhb/update_buy_four:
         post:
             tags:
                 - App

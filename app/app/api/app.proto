@@ -510,7 +510,7 @@ service App {
 
 	rpc AdminUpdateBuyFourAmount(AdminUpdateBuyFourRequest) returns (AdminUpdateBuyFourReply) {
 		option (google.api.http) = {
-			post: "/api/admin_dhb/update_amount_four"
+			post: "/api/admin_dhb/update_buy_four"
 			body: "send_body"
 		};
 	};

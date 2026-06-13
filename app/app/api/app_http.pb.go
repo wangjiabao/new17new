@@ -289,7 +289,7 @@ func RegisterAppHTTPServer(s *http.Server, srv AppHTTPServer) {
 	r.GET("/api/admin_dhb/test_money", _App_TestMoney0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/set_buy_four", _App_AdminSetBuyFour0_HTTP_Handler(srv))
 	r.GET("/api/admin_dhb/test_money_four", _App_TestMoneyFour0_HTTP_Handler(srv))
-	r.POST("/api/admin_dhb/update_amount_four", _App_AdminUpdateBuyFourAmount0_HTTP_Handler(srv))
+	r.POST("/api/admin_dhb/update_buy_four", _App_AdminUpdateBuyFourAmount0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/lock_user", _App_LockUser0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/lock_user_reward", _App_LockUserReward0_HTTP_Handler(srv))
 	r.POST("/api/admin_dhb/admin_recommend_level", _App_AdminRecommendLevelUpdate0_HTTP_Handler(srv))
@@ -2932,7 +2932,7 @@ func (c *AppHTTPClientImpl) AdminUndoUpdate(ctx context.Context, in *AdminUndoUp
 
 func (c *AppHTTPClientImpl) AdminUpdateBuyFourAmount(ctx context.Context, in *AdminUpdateBuyFourRequest, opts ...http.CallOption) (*AdminUpdateBuyFourReply, error) {
 	var out AdminUpdateBuyFourReply
-	pattern := "/api/admin_dhb/update_amount_four"
+	pattern := "/api/admin_dhb/update_buy_four"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAppAdminUpdateBuyFourAmount))
 	opts = append(opts, http.PathTemplate(pattern))
