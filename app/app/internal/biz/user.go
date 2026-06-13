@@ -10381,17 +10381,17 @@ func (uuc *UserUseCase) TestMoneyFour(ctx context.Context, req *v1.TestMoneyRequ
 
 			fmt.Println("补", v.ID, v.UserId, tmpUserId, v.Four)
 			// 增加业绩
-			//if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
-			//	err = uuc.uiRepo.UpdateUserMyTotalAmountAdd(ctx, tmpUserId, float64(v.Four), 0)
-			//	if err != nil {
-			//		return err
-			//	}
-			//
-			//	return nil
-			//}); nil != err {
-			//	fmt.Println("遍历业绩：", err, tmpUserId, v)
-			//	continue
-			//}
+			if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+				err = uuc.uiRepo.UpdateUserMyTotalAmountAdd(ctx, tmpUserId, float64(v.Four), 0)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			}); nil != err {
+				fmt.Println("遍历业绩：", err, tmpUserId, v)
+				continue
+			}
 		}
 	}
 
