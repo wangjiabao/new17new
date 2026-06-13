@@ -1235,7 +1235,7 @@ func (a *AppService) AdminSetBuyFour(ctx context.Context, req *v1.AdminSetIspayR
 	return a.uuc.AdminSetBuyFour(ctx, req)
 }
 
-func (a *AppService) AdminUpdateBuyFour(ctx context.Context, req *v1.AdminUpdateBuyFourRequest) (*v1.AdminUpdateBuyFourReply, error) {
+func (a *AppService) AdminUpdateBuyFourAmount(ctx context.Context, req *v1.AdminUpdateBuyFourRequest) (*v1.AdminUpdateBuyFourReply, error) {
 	return a.uuc.AdminUpdateBuyFour(ctx, req)
 }
 
