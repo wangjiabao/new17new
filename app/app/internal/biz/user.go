@@ -10379,7 +10379,7 @@ func (uuc *UserUseCase) TestMoneyFour(ctx context.Context, req *v1.TestMoneyRequ
 				continue
 			}
 
-			fmt.Println("补", tmpUserId, v.Four)
+			fmt.Println("补", v.ID, v.UserId, tmpUserId, v.Four)
 			// 增加业绩
 			//if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
 			//	err = uuc.uiRepo.UpdateUserMyTotalAmountAdd(ctx, tmpUserId, float64(v.Four), 0)
