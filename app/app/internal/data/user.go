@@ -1108,6 +1108,7 @@ func (u *UserRepo) GetUsers(ctx context.Context, b *biz.Pagination, address stri
 			AmountFourGet:    item.AmountFourGet,
 			AmountFour:       item.AmountFour,
 			IspayNew:         item.IspayNew,
+			VipNew:           item.VipNew,
 		})
 	}
 	return res, nil, count
