@@ -312,6 +312,13 @@ service App {
 		};
 	};
 
+	rpc AdminVipNewUpdate (AdminVipUpdateRequest) returns (AdminVipUpdateReply) {
+		option (google.api.http) = {
+			post: "/api/admin_dhb/vip_update_new"
+			body: "send_body"
+		};
+	};
+
 	rpc AdminSetPass (AdminSetPassRequest) returns (AdminSetPassReply) {
 		option (google.api.http) = {
 			post: "/api/admin_dhb/set_pass"
@@ -446,6 +453,12 @@ service App {
 	rpc AdminDailyAreaReward (AdminDailyLocationRewardRequest) returns (AdminDailyLocationRewardReply) {
 		option (google.api.http) = {
 			get: "/api/admin_dhb/daily_area_reward"
+		};
+	};
+
+	rpc AdminDailyAreaRewardNew (AdminDailyLocationRewardRequest) returns (AdminDailyLocationRewardReply) {
+		option (google.api.http) = {
+			get: "/api/admin_dhb/daily_area_reward_new"
 		};
 	};
 

@@ -2128,6 +2128,10 @@ func (a *AppService) AdminVipUpdate(ctx context.Context, req *v1.AdminVipUpdateR
 	return a.uuc.AdminVipUpdate(ctx, req)
 }
 
+func (a *AppService) AdminVipNewUpdate(ctx context.Context, req *v1.AdminVipUpdateRequest) (*v1.AdminVipUpdateReply, error) {
+	return a.uuc.AdminVipUpdateNew(ctx, req)
+}
+
 func (a *AppService) AdminSetPass(ctx context.Context, req *v1.AdminSetPassRequest) (*v1.AdminSetPassReply, error) {
 	return a.uuc.AdminSetPass(ctx, req)
 }
@@ -2308,6 +2312,10 @@ func (a *AppService) AdminDailyLocationRewardThree(ctx context.Context, req *v1.
 
 func (a *AppService) AdminDailyAreaReward(ctx context.Context, req *v1.AdminDailyLocationRewardRequest) (*v1.AdminDailyLocationRewardReply, error) {
 	return a.uuc.AdminDailyAreaReward(ctx, req)
+}
+
+func (a *AppService) AdminDailyAreaRewardNew(ctx context.Context, req *v1.AdminDailyLocationRewardRequest) (*v1.AdminDailyLocationRewardReply, error) {
+	return a.uuc.AdminDailyAreaRewardNew(ctx, req)
 }
 
 func (a *AppService) AdminDailyLocationRewardNew(ctx context.Context, req *v1.AdminDailyLocationRewardNewRequest) (*v1.AdminDailyLocationRewardNewReply, error) {

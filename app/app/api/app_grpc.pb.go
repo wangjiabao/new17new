@@ -67,6 +67,7 @@ const (
 	App_AdminUserPasswordUpdate_FullMethodName              = "/api.App/AdminUserPasswordUpdate"
 	App_AdminUpdateLocationNewMax_FullMethodName            = "/api.App/AdminUpdateLocationNewMax"
 	App_AdminVipUpdate_FullMethodName                       = "/api.App/AdminVipUpdate"
+	App_AdminVipNewUpdate_FullMethodName                    = "/api.App/AdminVipNewUpdate"
 	App_AdminSetPass_FullMethodName                         = "/api.App/AdminSetPass"
 	App_AdminAmountFourUpdate_FullMethodName                = "/api.App/AdminAmountFourUpdate"
 	App_AdminUndoUpdate_FullMethodName                      = "/api.App/AdminUndoUpdate"
@@ -88,6 +89,7 @@ const (
 	App_AdminDailyLocationReward_FullMethodName             = "/api.App/AdminDailyLocationReward"
 	App_AdminDailyLocationRewardThree_FullMethodName        = "/api.App/AdminDailyLocationRewardThree"
 	App_AdminDailyAreaReward_FullMethodName                 = "/api.App/AdminDailyAreaReward"
+	App_AdminDailyAreaRewardNew_FullMethodName              = "/api.App/AdminDailyAreaRewardNew"
 	App_AdminDailyLocationRewardNew_FullMethodName          = "/api.App/AdminDailyLocationRewardNew"
 	App_AdminAddMoney_FullMethodName                        = "/api.App/AdminAddMoney"
 	App_AdminAddMoneyTwo_FullMethodName                     = "/api.App/AdminAddMoneyTwo"
@@ -166,6 +168,7 @@ type AppClient interface {
 	AdminUserPasswordUpdate(ctx context.Context, in *AdminPasswordUpdateRequest, opts ...grpc.CallOption) (*AdminPasswordUpdateReply, error)
 	AdminUpdateLocationNewMax(ctx context.Context, in *AdminUpdateLocationNewMaxRequest, opts ...grpc.CallOption) (*AdminUpdateLocationNewMaxReply, error)
 	AdminVipUpdate(ctx context.Context, in *AdminVipUpdateRequest, opts ...grpc.CallOption) (*AdminVipUpdateReply, error)
+	AdminVipNewUpdate(ctx context.Context, in *AdminVipUpdateRequest, opts ...grpc.CallOption) (*AdminVipUpdateReply, error)
 	AdminSetPass(ctx context.Context, in *AdminSetPassRequest, opts ...grpc.CallOption) (*AdminSetPassReply, error)
 	AdminAmountFourUpdate(ctx context.Context, in *AdminAmountFourRequest, opts ...grpc.CallOption) (*AdminAmountFourReply, error)
 	AdminUndoUpdate(ctx context.Context, in *AdminUndoUpdateRequest, opts ...grpc.CallOption) (*AdminUndoUpdateReply, error)
@@ -187,6 +190,7 @@ type AppClient interface {
 	AdminDailyLocationReward(ctx context.Context, in *AdminDailyLocationRewardRequest, opts ...grpc.CallOption) (*AdminDailyLocationRewardReply, error)
 	AdminDailyLocationRewardThree(ctx context.Context, in *AdminDailyLocationRewardRequest, opts ...grpc.CallOption) (*AdminDailyLocationRewardReply, error)
 	AdminDailyAreaReward(ctx context.Context, in *AdminDailyLocationRewardRequest, opts ...grpc.CallOption) (*AdminDailyLocationRewardReply, error)
+	AdminDailyAreaRewardNew(ctx context.Context, in *AdminDailyLocationRewardRequest, opts ...grpc.CallOption) (*AdminDailyLocationRewardReply, error)
 	AdminDailyLocationRewardNew(ctx context.Context, in *AdminDailyLocationRewardNewRequest, opts ...grpc.CallOption) (*AdminDailyLocationRewardNewReply, error)
 	AdminAddMoney(ctx context.Context, in *AdminDailyAddMoneyRequest, opts ...grpc.CallOption) (*AdminDailyAddMoneyReply, error)
 	AdminAddMoneyTwo(ctx context.Context, in *AdminDailyAddMoneyTwoRequest, opts ...grpc.CallOption) (*AdminDailyAddMoneyTwoReply, error)
@@ -653,6 +657,15 @@ func (c *appClient) AdminVipUpdate(ctx context.Context, in *AdminVipUpdateReques
 	return out, nil
 }
 
+func (c *appClient) AdminVipNewUpdate(ctx context.Context, in *AdminVipUpdateRequest, opts ...grpc.CallOption) (*AdminVipUpdateReply, error) {
+	out := new(AdminVipUpdateReply)
+	err := c.cc.Invoke(ctx, App_AdminVipNewUpdate_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appClient) AdminSetPass(ctx context.Context, in *AdminSetPassRequest, opts ...grpc.CallOption) (*AdminSetPassReply, error) {
 	out := new(AdminSetPassReply)
 	err := c.cc.Invoke(ctx, App_AdminSetPass_FullMethodName, in, out, opts...)
@@ -836,6 +849,15 @@ func (c *appClient) AdminDailyLocationRewardThree(ctx context.Context, in *Admin
 func (c *appClient) AdminDailyAreaReward(ctx context.Context, in *AdminDailyLocationRewardRequest, opts ...grpc.CallOption) (*AdminDailyLocationRewardReply, error) {
 	out := new(AdminDailyLocationRewardReply)
 	err := c.cc.Invoke(ctx, App_AdminDailyAreaReward_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appClient) AdminDailyAreaRewardNew(ctx context.Context, in *AdminDailyLocationRewardRequest, opts ...grpc.CallOption) (*AdminDailyLocationRewardReply, error) {
+	out := new(AdminDailyLocationRewardReply)
+	err := c.cc.Invoke(ctx, App_AdminDailyAreaRewardNew_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1110,6 +1132,7 @@ type AppServer interface {
 	AdminUserPasswordUpdate(context.Context, *AdminPasswordUpdateRequest) (*AdminPasswordUpdateReply, error)
 	AdminUpdateLocationNewMax(context.Context, *AdminUpdateLocationNewMaxRequest) (*AdminUpdateLocationNewMaxReply, error)
 	AdminVipUpdate(context.Context, *AdminVipUpdateRequest) (*AdminVipUpdateReply, error)
+	AdminVipNewUpdate(context.Context, *AdminVipUpdateRequest) (*AdminVipUpdateReply, error)
 	AdminSetPass(context.Context, *AdminSetPassRequest) (*AdminSetPassReply, error)
 	AdminAmountFourUpdate(context.Context, *AdminAmountFourRequest) (*AdminAmountFourReply, error)
 	AdminUndoUpdate(context.Context, *AdminUndoUpdateRequest) (*AdminUndoUpdateReply, error)
@@ -1131,6 +1154,7 @@ type AppServer interface {
 	AdminDailyLocationReward(context.Context, *AdminDailyLocationRewardRequest) (*AdminDailyLocationRewardReply, error)
 	AdminDailyLocationRewardThree(context.Context, *AdminDailyLocationRewardRequest) (*AdminDailyLocationRewardReply, error)
 	AdminDailyAreaReward(context.Context, *AdminDailyLocationRewardRequest) (*AdminDailyLocationRewardReply, error)
+	AdminDailyAreaRewardNew(context.Context, *AdminDailyLocationRewardRequest) (*AdminDailyLocationRewardReply, error)
 	AdminDailyLocationRewardNew(context.Context, *AdminDailyLocationRewardNewRequest) (*AdminDailyLocationRewardNewReply, error)
 	AdminAddMoney(context.Context, *AdminDailyAddMoneyRequest) (*AdminDailyAddMoneyReply, error)
 	AdminAddMoneyTwo(context.Context, *AdminDailyAddMoneyTwoRequest) (*AdminDailyAddMoneyTwoReply, error)
@@ -1306,6 +1330,9 @@ func (UnimplementedAppServer) AdminUpdateLocationNewMax(context.Context, *AdminU
 func (UnimplementedAppServer) AdminVipUpdate(context.Context, *AdminVipUpdateRequest) (*AdminVipUpdateReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminVipUpdate not implemented")
 }
+func (UnimplementedAppServer) AdminVipNewUpdate(context.Context, *AdminVipUpdateRequest) (*AdminVipUpdateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminVipNewUpdate not implemented")
+}
 func (UnimplementedAppServer) AdminSetPass(context.Context, *AdminSetPassRequest) (*AdminSetPassReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminSetPass not implemented")
 }
@@ -1368,6 +1395,9 @@ func (UnimplementedAppServer) AdminDailyLocationRewardThree(context.Context, *Ad
 }
 func (UnimplementedAppServer) AdminDailyAreaReward(context.Context, *AdminDailyLocationRewardRequest) (*AdminDailyLocationRewardReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminDailyAreaReward not implemented")
+}
+func (UnimplementedAppServer) AdminDailyAreaRewardNew(context.Context, *AdminDailyLocationRewardRequest) (*AdminDailyLocationRewardReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminDailyAreaRewardNew not implemented")
 }
 func (UnimplementedAppServer) AdminDailyLocationRewardNew(context.Context, *AdminDailyLocationRewardNewRequest) (*AdminDailyLocationRewardNewReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminDailyLocationRewardNew not implemented")
@@ -2318,6 +2348,24 @@ func _App_AdminVipUpdate_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _App_AdminVipNewUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminVipUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).AdminVipNewUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: App_AdminVipNewUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).AdminVipNewUpdate(ctx, req.(*AdminVipUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _App_AdminSetPass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AdminSetPassRequest)
 	if err := dec(in); err != nil {
@@ -2692,6 +2740,24 @@ func _App_AdminDailyAreaReward_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppServer).AdminDailyAreaReward(ctx, req.(*AdminDailyLocationRewardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _App_AdminDailyAreaRewardNew_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminDailyLocationRewardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).AdminDailyAreaRewardNew(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: App_AdminDailyAreaRewardNew_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).AdminDailyAreaRewardNew(ctx, req.(*AdminDailyLocationRewardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3328,6 +3394,10 @@ var App_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _App_AdminVipUpdate_Handler,
 		},
 		{
+			MethodName: "AdminVipNewUpdate",
+			Handler:    _App_AdminVipNewUpdate_Handler,
+		},
+		{
 			MethodName: "AdminSetPass",
 			Handler:    _App_AdminSetPass_Handler,
 		},
@@ -3410,6 +3480,10 @@ var App_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdminDailyAreaReward",
 			Handler:    _App_AdminDailyAreaReward_Handler,
+		},
+		{
+			MethodName: "AdminDailyAreaRewardNew",
+			Handler:    _App_AdminDailyAreaRewardNew_Handler,
 		},
 		{
 			MethodName: "AdminDailyLocationRewardNew",
