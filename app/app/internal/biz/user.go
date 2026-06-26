@@ -10851,20 +10851,22 @@ func (uuc *UserUseCase) AdminDailyAreaRewardNew(ctx context.Context, req *v1.Adm
 			continue
 		}
 
-		if 1 == vUsers.VipNew {
-			userReward1 = append(userReward1, vUsers)
-			continue
-		} else if 2 == vUsers.VipNew {
-			userReward2 = append(userReward2, vUsers)
-			continue
-		} else if 3 == vUsers.VipNew {
-			userReward3 = append(userReward3, vUsers)
-			continue
-		} else if 4 == vUsers.VipNew {
-			userReward4 = append(userReward4, vUsers)
-			continue
-		} else if 5 == vUsers.VipNew {
-			userReward5 = append(userReward5, vUsers)
+		if 0 < vUsers.VipNew {
+			if 1 <= vUsers.VipNew {
+				userReward1 = append(userReward1, vUsers)
+			}
+			if 2 <= vUsers.VipNew {
+				userReward2 = append(userReward2, vUsers)
+			}
+			if 3 <= vUsers.VipNew {
+				userReward3 = append(userReward3, vUsers)
+			}
+			if 4 <= vUsers.VipNew {
+				userReward4 = append(userReward4, vUsers)
+			}
+			if 5 <= vUsers.VipNew {
+				userReward5 = append(userReward5, vUsers)
+			}
 			continue
 		}
 
@@ -10906,13 +10908,21 @@ func (uuc *UserUseCase) AdminDailyAreaRewardNew(ctx context.Context, req *v1.Adm
 
 		if a5 <= tmpAreaMin {
 			userReward5 = append(userReward5, vUsers)
-		} else if a4 <= tmpAreaMin {
+		}
+
+		if a4 <= tmpAreaMin {
 			userReward4 = append(userReward4, vUsers)
-		} else if a3 <= tmpAreaMin {
+		}
+
+		if a3 <= tmpAreaMin {
 			userReward3 = append(userReward3, vUsers)
-		} else if a2 <= tmpAreaMin {
+		}
+
+		if a2 <= tmpAreaMin {
 			userReward2 = append(userReward2, vUsers)
-		} else if a1 <= tmpAreaMin {
+		}
+
+		if a1 <= tmpAreaMin {
 			userReward1 = append(userReward1, vUsers)
 		}
 	}

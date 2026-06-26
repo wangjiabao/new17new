@@ -1404,7 +1404,7 @@ func (ui *UserInfoRepo) UpdateUserAreaNewReward(ctx context.Context, userId, num
 		reward.UserId = userId
 		reward.AmountNew = usdt
 		reward.AmountNewTwo = 0
-		reward.TypeRecordId = num
+		reward.BalanceRecordId = num
 		reward.Reason = "daily_area_new" // 直推
 		res = ui.data.DB(ctx).Table("reward").Create(&reward)
 		if res.Error != nil || 1 != res.RowsAffected {
