@@ -2184,8 +2184,7 @@ func (a *AppService) DownloadData(ctx context.Context, req *v1.DownloadDataReque
 }
 
 func (a *AppService) AdminUndoUpdate(ctx context.Context, req *v1.AdminUndoUpdateRequest) (*v1.AdminUndoUpdateReply, error) {
-	//return a.uuc.AdminUndoUpdate(ctx, req)
-	return &v1.AdminUndoUpdateReply{}, nil
+	return a.uuc.AdminUndoUpdate(ctx, req)
 }
 
 func (a *AppService) LockUser(ctx context.Context, req *v1.LockUserRequest) (*v1.LockUserReply, error) {
