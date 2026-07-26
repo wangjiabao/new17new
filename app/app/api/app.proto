@@ -913,6 +913,7 @@ message AdminUserListReply { // 用户信息
 		int64 lock = 12; // 锁定状态
 		int64 lockReward = 13; // 开启禁止上级分红 1表示开启，0表示关闭
 		string myRecommendAddress = 25;
+		int64 unDo = 26;
 	}
 
 	int64 count = 2;

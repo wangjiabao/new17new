@@ -1049,6 +1049,7 @@ func (uuc *UserUseCase) AdminUserList(ctx context.Context, req *v1.AdminUserList
 			Lock:               vUsers.Lock,
 			LockReward:         vUsers.LockReward,
 			MyRecommendAddress: addressMyRecommend,
+			UnDo:               vUsers.Undo,
 		})
 	}
 
