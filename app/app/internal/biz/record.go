@@ -13,17 +13,18 @@ import (
 )
 
 type EthUserRecord struct {
-	ID        int64
-	UserId    int64
-	Hash      string
-	Status    string
-	Type      string
-	Amount    string
-	AmountTwo uint64
-	RelAmount int64
-	CoinType  string
-	Last      int64
-	CreatedAt time.Time
+	ID            int64
+	UserId        int64
+	Hash          string
+	Status        string
+	Type          string
+	Amount        string
+	AmountTwo     uint64
+	RelAmount     int64
+	CoinType      string
+	Last          int64
+	RecommendCode string
+	CreatedAt     time.Time
 }
 
 type Location struct {
@@ -635,6 +636,16 @@ func (ruc *RecordUseCase) DepositNewNew(ctx context.Context, userId int64, amoun
 	var (
 		err error
 	)
+
+	// 推荐
+	var (
+		userRecommend *UserRecommend
+	)
+	userRecommend, err = ruc.userRecommendRepo.GetUserRecommendByUserId(ctx, eth.UserId)
+	if nil == userRecommend || nil != err {
+		return err
+	}
+
 	// 入金
 	if err = ruc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
 		err = ruc.userInfoRepo.UpdateUserNewTwoNewTwoTwo(ctx, userId, amount)
@@ -645,14 +656,15 @@ func (ruc *RecordUseCase) DepositNewNew(ctx context.Context, userId int64, amoun
 		// 充值记录
 		if !system {
 			_, err = ruc.ethUserRecordRepo.CreateEthUserRecordListByHash(ctx, &EthUserRecord{
-				Hash:      eth.Hash,
-				UserId:    eth.UserId,
-				Status:    eth.Status,
-				Type:      eth.Type,
-				Amount:    eth.Amount,
-				AmountTwo: amount,
-				CoinType:  eth.CoinType,
-				Last:      eth.Last,
+				Hash:          eth.Hash,
+				UserId:        eth.UserId,
+				Status:        eth.Status,
+				Type:          eth.Type,
+				Amount:        eth.Amount,
+				AmountTwo:     amount,
+				CoinType:      eth.CoinType,
+				Last:          eth.Last,
+				RecommendCode: userRecommend.RecommendCode,
 			})
 			if nil != err {
 				return err

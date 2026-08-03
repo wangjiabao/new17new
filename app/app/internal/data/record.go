@@ -10,17 +10,18 @@ import (
 )
 
 type EthUserRecord struct {
-	ID        int64     `gorm:"primarykey;type:int"`
-	Hash      string    `gorm:"type:varchar(100);not null"`
-	UserId    int64     `gorm:"type:int;not null"`
-	Status    string    `gorm:"type:varchar(45);not null"`
-	Type      string    `gorm:"type:varchar(45);not null"`
-	Amount    string    `gorm:"type:varchar(45);not null"`
-	AmountTwo uint64    `gorm:"type:bigint;not null"`
-	CoinType  string    `gorm:"type:varchar(45);not null"`
-	CreatedAt time.Time `gorm:"type:datetime;not null"`
-	UpdatedAt time.Time `gorm:"type:datetime;not null"`
-	Last      int64     `gorm:"type:int;not null"`
+	ID            int64     `gorm:"primarykey;type:int"`
+	Hash          string    `gorm:"type:varchar(100);not null"`
+	UserId        int64     `gorm:"type:int;not null"`
+	Status        string    `gorm:"type:varchar(45);not null"`
+	Type          string    `gorm:"type:varchar(45);not null"`
+	Amount        string    `gorm:"type:varchar(45);not null"`
+	AmountTwo     uint64    `gorm:"type:bigint;not null"`
+	CoinType      string    `gorm:"type:varchar(45);not null"`
+	CreatedAt     time.Time `gorm:"type:datetime;not null"`
+	UpdatedAt     time.Time `gorm:"type:datetime;not null"`
+	RecommendCode string    `gorm:"type:varchar(2500);not null"`
+	Last          int64     `gorm:"type:int;not null"`
 }
 
 type EthUserRecordRepo struct {
@@ -123,6 +124,7 @@ func (e *EthUserRecordRepo) CreateEthUserRecordListByHash(ctx context.Context, r
 	ethUserRecord.AmountTwo = r.AmountTwo
 	ethUserRecord.CoinType = r.CoinType
 	ethUserRecord.Last = r.Last
+	ethUserRecord.RecommendCode = r.RecommendCode
 
 	res := e.data.DB(ctx).Table("eth_user_record").Create(&ethUserRecord)
 	if res.Error != nil {
